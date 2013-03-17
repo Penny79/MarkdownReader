@@ -1,0 +1,51 @@
+﻿@using Markdown.Reader.Models
+
+@model Markdown.Reader.Models.ReaderViewModel
+
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<nav id="nav">
+<ul id="navigation">
+    @TreeView( Model.ContentTree.ChildItems )
+</ul>
+    </nav>
+<br style="clear:both;">
+@Html.Raw(Model.Document);
+
+@helper TreeView( IEnumerable<ContentItem> folders )
+{
+    bool firstHandled = false;
+
+
+    foreach (var folder in folders)
+    {
+        <li>
+            @{
+                string href = folder.IsLeaf ? Url.Action("ShowDocument", new {id = @folder.Id}) : String.Empty;
+                string customClass = !firstHandled && folder.Level == 2 ? "first" : "";
+               
+                firstHandled = true;
+            }
+            
+            @if (folder.ChildItems.Count > 0)
+            {
+                 <a href="@href" class="@customClass">@folder.Name &raquo;</a>
+            }
+            else
+            {
+                 <a href="@href" class="@customClass">@folder.Name</a>
+            }
+           
+            @if (!folder.IsLeaf)
+            {
+
+                <ul>
+                    @TreeView(folder.ChildItems)
+                </ul>
+            }
+           
+        </li>
+    }
+}
